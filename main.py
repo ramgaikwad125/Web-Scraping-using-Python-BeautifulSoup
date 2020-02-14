@@ -1,29 +1,16 @@
+#--------------------------
+# Import the Statments
+#--------------------------
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from datetime import date
-from datetime import datetime 
-import pymongo
-from pymongo import MongoClient
-import json
-import dateutil.parser
-import http.client as http 
-import json
-import schedule # use to make schedule of getting data 
-import pandas_market_calendars as mcal
-from ftplib import FTP
-from pandas_datareader.data import DataReader as dr
-import os
-from zipfile import ZipFile
-import zipfile
-import re
-import csv
-import NSE_webscraping
-from NSE_webscraping import get_expiry_from_option_chain,get_strike_price_from_option_chain,strike_group_def,expiration_group_def
+from NSE_webscraping import get_strike_price_from_option_chain,strike_group_def
+from NSE_webscraping import get_expiry_from_option_chain,expiration_group_def
 
 
-
-## NIFTY50
+#----------------------
+#  Get NIFTY50 data
+#----------------------
 nifty50_url = "https://trendlyne.com/equity/DIV/NIFTY50/1887/nifty-50-dividend-yield/"
 page = requests.get(nifty50_url)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -36,7 +23,9 @@ print('Nifty50 Dividend:',nifty50_div)
 print('Nifty50 Close Price:',nifty50_close_price)
 
 
-## BANKNIFTY
+#------------------------
+# Get BANKNIFTY data
+#------------------------
 banknifty_url = "https://trendlyne.com/equity/PE/NIFTYBANK/1898/nifty-bank-price-to-earning-ratios/"
 page = requests.get(banknifty_url)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -48,7 +37,10 @@ except:
 print('BankNifty Dividend:',banknifty_div)
 print('BankNifty Close Price:',banknifty_close_price)
 
-## Interest Rate
+
+#-----------------------
+# get Interest Rate
+#-----------------------
 repo_rate = "https://www.rbi.org.in/home.aspx"
 page = requests.get(repo_rate)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -108,8 +100,8 @@ def get_data():
         appended_DATA['expiration'] = pd.to_datetime(appended_DATA.expiration,format = '%d%b%Y')
         appended_DATA = appended_DATA.fillna(0)
 
-        appended_DATA = NSE_webscraping.expiration_group_def(appended_DATA)
-        appended_DATA = NSE_webscraping.strike_group_def(appended_DATA)
+        appended_DATA = expiration_group_def(appended_DATA)
+        appended_DATA = strike_group_def(appended_DATA)
         appended_DATA['bid_1545'] = pd.to_numeric(appended_DATA['bid_1545'], errors='coerce')
         appended_DATA['ask_1545'] = pd.to_numeric(appended_DATA['ask_1545'], errors='coerce')
         appended_DATA['volume'] = pd.to_numeric(appended_DATA['volume'], errors='coerce')
